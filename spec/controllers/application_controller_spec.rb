@@ -6,24 +6,23 @@ describe ApplicationController do
     it 'loads the homepage' do
       get '/'
       expect(last_response.status).to eq(200)
-      expect(last_response.body).to include("Welcome to Fwitter")
+      expect(last_response.body).to include("Welcome")
     end
   end
 
   describe "Signup Page" do
 
     it 'loads the signup page' do
-      get '/signup'
+      get '/coaches/signup'
       expect(last_response.status).to eq(200)
     end
 
-    it 'signup directs user to twitter index' do
+    it 'signup directs user to boat index' do
       params = {
-        :username => "skittles123",
-        :email => "skittles@aol.com",
+        :name => "skittles123",
         :password => "rainbows"
       }
-      post '/signup', params
+      post '/coaches/signup', params
       expect(last_response.location).to include("/tweets")
     end
 
