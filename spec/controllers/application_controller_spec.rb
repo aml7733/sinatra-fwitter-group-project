@@ -10,248 +10,81 @@ describe ApplicationController do
     end
   end
 
-  describe "Signup Page" do
-
-    it 'loads the signup page' do
-      get '/coaches/signup'
-      expect(last_response.status).to eq(200)
-    end
-
-    it 'signup directs coach to boat index' do
-      params = {
-        :name => "skittles123",
-        :password => "rainbows"
-      }
-      post '/coaches/signup', params
-      expect(last_response.location).to include("/coaches/myboats")
-    end
-
-    it 'does not let a coach sign up without a name' do
-      params = {
-        :name => "",
-        :password => "rainbows"
-      }
-      post '/coaches/signup', params
-      expect(last_response.location).to include('/coaches/signup')
-    end
-
-    it 'does not let a coach sign up without a password' do
-      params = {
-        :name => "skittles123",
-        :password => ""
-      }
-      post '/coaches/signup', params
-      expect(last_response.location).to include('/coaches/signup')
-    end
-
-    it 'does not let a logged in user view the signup page' do
-      coach = Coach.create(:name => "skittles123", :password => "rainbows")
-      params = {
-        :name => "skittles123",
-        :password => "rainbows"
-      }
-      post '/coaches/signup', params
-      session = {}
-      session[:id] = coach.id
-      get '/coaches/signup'
-      expect(last_response.location).to include('/coaches/myboats')
-    end
-  end
-
-  describe "login" do
-    it 'loads the login page' do
-      get '/coaches/login'
-      expect(last_response.status).to eq(200)
-    end
-
-    it 'loads the boat index after login' do
-      coach = Coach.create(:name => "becky567", :password => "kittens")
-      params = {
-        :name => "becky567",
-        :password => "kittens"
-      }
-      post '/coaches/login', params
-      expect(last_response.status).to eq(302)
-      follow_redirect!
-      expect(last_response.status).to eq(200)
-      expect(last_response.body).to include("Your Boats:")
-    end
-
-    it 'does not let coach view login page if already logged in' do
-      coach = Coach.create(:name => "becky567", :password => "kittens")
-
-      params = {
-        :name => "becky567",
-        :password => "kittens"
-      }
-      post '/coaches/login', params
-      session = {}
-      session[:id] = coach.id
-      get '/coaches/login'
-      expect(last_response.location).to include("/tweets")
-    end
-  end
-
-  describe "logout" do
-    it "lets a coach logout if they are already logged in" do
-      coach = Coach.create(:name => "becky567", :password => "kittens")
-
-      params = {
-        :name => "becky567",
-        :password => "kittens"
-      }
-      post '/coaches/login', params
-      get '/coaches/logout'
-      expect(last_response.location).to include("/coaches/login")
-
-    end
-
-    it 'does not let a coach logout if not logged in' do
-      get '/coaches/logout'
-      expect(last_response.location).to include("/")
-    end
-
-    it 'does not load create boats page if coach not logged in' do
-      get '/boat/new'
-      expect(last_response.location).to include("/coaches/login")
-    end
-
-    it 'does load create boats page if coach is logged in' do
-      coach = Coach.create(:name => "becky567", :password => "kittens")
-
-
-      visit '/coaches/login'
-
-      fill_in('coach[name]', :with => "becky567")
-      fill_in('coach[password]', :with => "kittens")
-      click_button 'submit'
-      expect(page.current_path).to eq('/coaches/myboats')
-      click_button 'Create New Boat'
-      expect(page.current_path).to eq('/boat/new')
-
-
-    end
-  end
-
-  describe 'Coach show page' do
-    it "shows all a single coach's boats" do
-      coach = Coach.create(:name => "becky567", :password => "kittens")
-      boat1 = Boat.create(name: "Shirley", weight: 200, num_seats: 8, coach_id: coach.id)
-      boat2 = Boat.create(name: "Tiny", weight: 100, num_seats: 8, coach_id: coach.id)
-      get "/coaches/#{coach.slug}"
-
-      expect(last_response.body).to include("Shirley")
-      expect(last_response.body).to include("Tiny")
-
-    end
-  end
-
-  describe 'index action' do
-    context 'logged in' do
-      it 'lets a user view the tweets index if logged in' do
-        user1 = User.create(:username => "becky567", :email => "starz@aol.com", :password => "kittens")
-        tweet1 = Tweet.create(:content => "tweeting!", :user_id => user1.id)
-
-        user2 = User.create(:username => "silverstallion", :email => "silver@aol.com", :password => "horses")
-        tweet2 = Tweet.create(:content => "look at this tweet", :user_id => user2.id)
-
-        visit '/login'
-
-        fill_in(:username, :with => "becky567")
-        fill_in(:password, :with => "kittens")
-        click_button 'submit'
-        visit "/tweets"
-        expect(page.body).to include(tweet1.content)
-        expect(page.body).to include(tweet2.content)
-      end
-    end
-
-
-    context 'logged out' do
-      it 'does not let a user view the tweets index if not logged in' do
-        get '/tweets'
-        expect(last_response.location).to include("/login")
-      end
-    end
-
-  end
-
-
-
   describe 'new action' do
     context 'logged in' do
-      it 'lets user view new tweet form if logged in' do
-        user = User.create(:username => "becky567", :email => "starz@aol.com", :password => "kittens")
+      it 'lets coach view new boat form if logged in' do
+        coach = Coach.create(:name => "becky567", :password => "kittens")
 
-        visit '/login'
+        visit '/coaches/login'
 
-        fill_in(:username, :with => "becky567")
-        fill_in(:password, :with => "kittens")
+        fill_in('coach[name]', :with => "becky567")
+        fill_in('coach[password]', :with => "kittens")
         click_button 'submit'
-        visit '/tweets/new'
+        visit '/boat/new'
         expect(page.status_code).to eq(200)
 
       end
 
-      it 'lets user create a tweet if they are logged in' do
-        user = User.create(:username => "becky567", :email => "starz@aol.com", :password => "kittens")
+      it 'lets coach create a boat if they are logged in' do
+        coach = Coach.create(:name => "becky567", :password => "kittens")
 
-        visit '/login'
+        visit '/coaches/login'
 
-        fill_in(:username, :with => "becky567")
-        fill_in(:password, :with => "kittens")
+        fill_in('coach[name]', :with => "becky567")
+        fill_in('coach[password]', :with => "kittens")
         click_button 'submit'
 
-        visit '/tweets/new'
-        fill_in(:content, :with => "tweet!!!")
+        visit '/boat/new'
+        fill_in('boat[name]', :with => "Pair")
+        fill_in('boat[weight]', :with => 100)
+        fill_in('boat[num_seats]', :with => 2)
         click_button 'submit'
 
-        user = User.find_by(:username => "becky567")
-        tweet = Tweet.find_by(:content => "tweet!!!")
-        expect(tweet).to be_instance_of(Tweet)
-        expect(tweet.user_id).to eq(user.id)
+        coach = Coach.find_by(:name => "becky567")
+        boat = Boat.find_by(:name => "Pair")
+        expect(boat).to be_instance_of(Boat)
+        expect(boat.coach_id).to eq(coach.id)
         expect(page.status_code).to eq(200)
       end
 
-      it 'does not let a user tweet from another user' do
-        user = User.create(:username => "becky567", :email => "starz@aol.com", :password => "kittens")
-        user2 = User.create(:username => "silverstallion", :email => "silver@aol.com", :password => "horses")
+      it "does not let a coach edit another coach's boat" do
+        coach = Coach.create(:name => "becky567", :password => "kittens")
+        coach2 = Coach.create(:name => "silverstallion", :password => "horses")
+        boat = Boat.create(name: "Pair", weight: 100, num_seats: 2, coach_id: coach2.id)
 
-        visit '/login'
+        visit '/coaches/login'
 
-        fill_in(:username, :with => "becky567")
-        fill_in(:password, :with => "kittens")
+        fill_in('coach[name]', :with => "becky567")
+        fill_in('coach[password]', :with => "kittens")
         click_button 'submit'
 
-        visit '/tweets/new'
-
-        fill_in(:content, :with => "tweet!!!")
+        visit '/boat/edit/#{boat.slug}'
+        fill_in('boat[name]', :with => "Double")
+        fill_in('boat[weight]', :with => 120)
+        fill_in('boat[num_seats]', :with => 2)
         click_button 'submit'
 
-        user = User.find_by(:id=> user.id)
-        user2 = User.find_by(:id => user2.id)
-        tweet = Tweet.find_by(:content => "tweet!!!")
-        expect(tweet).to be_instance_of(Tweet)
-        expect(tweet.user_id).to eq(user.id)
-        expect(tweet.user_id).not_to eq(user2.id)
+        expect(last_response.body).to include("Sorry, only the boat's coach can edit the boat.")
+        expect(boat.coach_id).to eq(coach2.id)
       end
 
-      it 'does not let a user create a blank tweet' do
-        user = User.create(:username => "becky567", :email => "starz@aol.com", :password => "kittens")
+      it 'does not let a coach create an empty boat' do
 
-        visit '/login'
+        coach = Coach.create(:name => "becky567", :password => "kittens")
 
-        fill_in(:username, :with => "becky567")
-        fill_in(:password, :with => "kittens")
+        visit '/coaches/login'
+
+        fill_in('coach[name]', :with => "becky567")
+        fill_in('coach[password]', :with => "kittens")
         click_button 'submit'
 
-        visit '/tweets/new'
+        visit '/boat/new'
 
-        fill_in(:content, :with => "")
+        fill_in('boat[name]', :with => "")
         click_button 'submit'
 
-        expect(Tweet.find_by(:content => "")).to eq(nil)
-        expect(page.current_path).to eq("/tweets/new")
+        expect(Boat.find_by(:name => "")).to eq(nil)
+        expect(page.current_path).to eq("/boat/new")
 
       end
     end
@@ -426,4 +259,144 @@ describe ApplicationController do
   end
 
 
+end
+
+describe CoachController do
+  describe "Signup Page" do
+
+    it 'loads the signup page' do
+      get '/coaches/signup'
+      expect(last_response.status).to eq(200)
+    end
+
+    it 'signup directs coach to boat index' do
+      params = {
+        :name => "skittles123",
+        :password => "rainbows"
+      }
+      post '/coaches/signup', params
+      expect(last_response.location).to include("/coaches/myboats")
+    end
+
+    it 'does not let a coach sign up without a name' do
+      params = {
+        :name => "",
+        :password => "rainbows"
+      }
+      post '/coaches/signup', params
+      expect(last_response.location).to include('/coaches/signup')
+    end
+
+    it 'does not let a coach sign up without a password' do
+      params = {
+        :name => "skittles123",
+        :password => ""
+      }
+      post '/coaches/signup', params
+      expect(last_response.location).to include('/coaches/signup')
+    end
+
+    it 'does not let a logged in user view the signup page' do
+      coach = Coach.create(:name => "skittles123", :password => "rainbows")
+      params = {
+        :name => "skittles123",
+        :password => "rainbows"
+      }
+      post '/coaches/signup', params
+      session = {}
+      session[:id] = coach.id
+      get '/coaches/signup'
+      expect(last_response.location).to include('/coaches/myboats')
+    end
+  end
+
+  describe "login" do
+    it 'loads the login page' do
+      get '/coaches/login'
+      expect(last_response.status).to eq(200)
+    end
+
+    it 'loads the boat index after login' do
+      coach = Coach.create(:name => "becky567", :password => "kittens")
+      params = {
+        :name => "becky567",
+        :password => "kittens"
+      }
+      post '/coaches/login', params
+      expect(last_response.status).to eq(302)
+      follow_redirect!
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to include("Your Boats:")
+    end
+
+    it 'does not let coach view login page if already logged in' do
+      coach = Coach.create(:name => "becky567", :password => "kittens")
+
+      params = {
+        :name => "becky567",
+        :password => "kittens"
+      }
+      post '/coaches/login', params
+      session = {}
+      session[:id] = coach.id
+      get '/coaches/login'
+      expect(last_response.location).to include("/tweets")
+    end
+  end
+
+  describe "logout" do
+    it "lets a coach logout if they are already logged in" do
+      coach = Coach.create(:name => "becky567", :password => "kittens")
+
+      params = {
+        :name => "becky567",
+        :password => "kittens"
+      }
+      post '/coaches/login', params
+      get '/coaches/logout'
+      expect(last_response.location).to include("/coaches/login")
+
+    end
+
+    it 'does not let a coach logout if not logged in' do
+      get '/coaches/logout'
+      expect(last_response.location).to include("/")
+    end
+
+    it 'does not load create boats page if coach not logged in' do
+      get '/boat/new'
+      expect(last_response.location).to include("/coaches/login")
+    end
+
+    it 'does load create boats page if coach is logged in' do
+      coach = Coach.create(:name => "becky567", :password => "kittens")
+
+
+      visit '/coaches/login'
+
+      fill_in('coach[name]', :with => "becky567")
+      fill_in('coach[password]', :with => "kittens")
+      click_button 'submit'
+      expect(page.current_path).to eq('/coaches/myboats')
+      click_button 'Create New Boat'
+      expect(page.current_path).to eq('/boat/new')
+
+
+    end
+  end
+
+  describe 'Coach show page' do
+    it "shows all a single coach's boats" do
+      coach = Coach.create(:name => "becky567", :password => "kittens")
+      boat1 = Boat.create(name: "Shirley", weight: 200, num_seats: 8, coach_id: coach.id)
+      boat2 = Boat.create(name: "Tiny", weight: 100, num_seats: 8, coach_id: coach.id)
+      get "/coaches/#{coach.slug}"
+
+      expect(last_response.body).to include("Shirley")
+      expect(last_response.body).to include("Tiny")
+      expect(last_response.body).to include("Create New Boat")
+      expect(last_response.body).to include("Create New Boat")
+
+    end
+  end
 end

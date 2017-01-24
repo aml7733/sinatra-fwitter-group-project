@@ -11,4 +11,18 @@ class ApplicationController < Sinatra::Base
   get '/' do
     erb :index
   end
+
+  helpers do
+    def logged_in?
+      !!session[:id]
+    end
+
+    def current_coach
+      Coach.find(session[:id])
+    end
+
+    def current_coach_boats
+      current_coach.boats
+    end
+  end
 end
