@@ -17,57 +17,44 @@ describe ApplicationController do
       expect(last_response.status).to eq(200)
     end
 
-    it 'signup directs user to boat index' do
+    it 'signup directs coach to boat index' do
       params = {
         :name => "skittles123",
         :password => "rainbows"
       }
       post '/coaches/signup', params
-      expect(last_response.location).to include("/tweets")
+      expect(last_response.location).to include("/coaches/myboats")
     end
 
-    it 'does not let a user sign up without a username' do
+    it 'does not let a coach sign up without a name' do
       params = {
-        :username => "",
-        :email => "skittles@aol.com",
+        :name => "",
         :password => "rainbows"
       }
-      post '/signup', params
-      expect(last_response.location).to include('/signup')
+      post '/coaches/signup', params
+      expect(last_response.location).to include('/coaches/signup')
     end
 
-    it 'does not let a user sign up without an email' do
+    it 'does not let a coach sign up without a password' do
       params = {
-        :username => "skittles123",
-        :email => "",
-        :password => "rainbows"
-      }
-      post '/signup', params
-      expect(last_response.location).to include('/signup')
-    end
-
-    it 'does not let a user sign up without a password' do
-      params = {
-        :username => "skittles123",
-        :email => "skittles@aol.com",
+        :name => "skittles123",
         :password => ""
       }
-      post '/signup', params
-      expect(last_response.location).to include('/signup')
+      post '/coaches/signup', params
+      expect(last_response.location).to include('/coaches/signup')
     end
 
     it 'does not let a logged in user view the signup page' do
-      user = User.create(:username => "skittles123", :email => "skittles@aol.com", :password => "rainbows")
+      coach = Coach.create(:name => "skittles123", :password => "rainbows")
       params = {
-        :username => "skittles123",
-        :email => "skittles@aol.com",
+        :name => "skittles123",
         :password => "rainbows"
       }
-      post '/signup', params
+      post '/coaches/signup', params
       session = {}
-      session[:id] = user.id
-      get '/signup'
-      expect(last_response.location).to include('/tweets')
+      session[:id] = coach.id
+      get '/coaches/signup'
+      expect(last_response.location).to include('/coaches/myboats')
     end
   end
 
