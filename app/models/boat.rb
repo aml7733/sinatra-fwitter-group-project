@@ -1,4 +1,6 @@
+require './config/environment'
+
 class Boat < ActiveRecord::Base
   belongs_to :coach
-  has_many :rowers  
+  has_many :rowers
 end

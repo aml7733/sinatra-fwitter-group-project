@@ -10,7 +10,7 @@ describe 'Coach' do
 
   it 'can find a coach based on the slug' do
     slug = @coach.slug
-    expect(User.find_by_slug(slug).username).to eq("test 123")
+    expect(Coach.find_by_slug(slug).name).to eq("test 123")
   end
 
   it 'has a secure password' do
