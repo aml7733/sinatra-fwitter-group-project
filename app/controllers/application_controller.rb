@@ -12,9 +12,20 @@ class ApplicationController < Sinatra::Base
     erb :index
   end
 
+  get '/boat/new' do
+    if !logged_in?
+      redirect '/coaches/login'
+    end
+    erb :'/boats/new'
+  end
+
+  post '/boat/new' do
+    
+  end
+
   post '/boat/edit' do
     @boat = Boat.find_by(params[:boat])
-    
+    erb :'/boats/edit'
   end
 
   helpers do
