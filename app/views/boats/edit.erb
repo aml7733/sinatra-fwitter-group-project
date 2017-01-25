@@ -1,0 +1,30 @@
+<h1>Edit boat <%= @boat.name %></h1>
+
+<form action="/boats/edit" method="post">
+  <label>Boat Name:</label>
+  <input type="text" name= "boat[name]" value="<%= @boat.name %>"><br>
+  <label>Number of Seats:</label>
+  <input type="text" name="boat[num_seats]" value="<%= @boat.num_seats %>"><br>
+  <label>Weight:</label>
+  <input type="text" name="boat[weight]" value="<%= @boat.weight %>"><br>
+  <br>
+
+  <label>Choose Existing Rowers:</label>
+  <% Rower.all.each do |rower| %>
+    <input type="checkbox" name="boat[rower_ids][]" id="<%= rower.id %>" value="<%= rower.id %>" <%='checked' if @boat.rowers.include?(rower) %>><%=rower.name%></input>
+  <%end%>
+
+  <br></br>
+
+  <label>and/or, create new rowers:</label>
+  <br>
+  <% @boat.num_seats.times do %>
+    <label>Name:</label>
+    <input  type="text" name="rower[][name]"><br>
+    <label>Weight:</label>
+    <input type="text" name="rower[][weight]"><br>
+    <label>Power:</label>
+    <input type="text" name="rower[][power]"><br>
+  <%end%>
+  <input type="submit" value="submit">
+</form>

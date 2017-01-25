@@ -40,9 +40,7 @@ class CoachController < ApplicationController
   end
 
   get '/coaches/myboats' do
-    if session[:id]
-      erb :'/coaches/myboats'
-    end
-    redirect '/coaches/login'
+    redirect '/coaches/login' unless session[:id]
+    erb :'/coaches/myboats'
   end
 end

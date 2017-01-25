@@ -2,21 +2,16 @@
 
 <% current_coach.boats.each do |boat| %>
   <h3><%= boat.name %></h3>
-  <p>
-    <%= boat.rowers.each do |rower|%>
-      <%= rower.name %><br>
-    <% end %>
-  </p><br>
-<%= end %>
+<% end %>
 
 
 
 <br>
 <a href="/coaches/logout">Log Out</a>
 <br>
-<a href="/boat/new"></a>
+<a href="/boats/new">New Boat</a>
 <br>
-<form action="/boat/edit" method="post">
+<form action="/boats/edit" method="post">
   <label>Enter the name of the boat you'd like to edit:</label>
   <input type="text" name="boat[name]">
   <input type="submit" name="submit" value="submit">
