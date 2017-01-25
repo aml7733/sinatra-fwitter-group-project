@@ -20,7 +20,11 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/boat/new' do
-    
+    params[:boat].each_pair { |key, val| redirect '/boat/new' if val == "" }
+
+    boat = Boat.create(params[:boat])
+    boat.coach_id = session[:id]
+    redirect '/coaches/myboats'
   end
 
   post '/boat/edit' do
