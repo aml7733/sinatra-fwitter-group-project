@@ -12,6 +12,11 @@ class ApplicationController < Sinatra::Base
     erb :index
   end
 
+  post '/boat/edit' do
+    @boat = Boat.find_by(params[:boat])
+    
+  end
+
   helpers do
     def logged_in?
       !!session[:id]
