@@ -5,6 +5,9 @@
     <title>Crew Coach App</title>
   </head>
   <body>
+    <% if flash.has?(:message) %>
+      <%= flash[:message] %>
+    <% end %>
     <%= yield %>
   </body>
 </html>

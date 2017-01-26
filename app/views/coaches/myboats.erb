@@ -1,7 +1,15 @@
 <h1>Here are your boats, <%= current_coach.name %></h1>
 
 <% current_coach.boats.each do |boat| %>
-  <h3><%= boat.name %></h3>
+  <h3>Name: <%= boat.name %></h3>
+  <h5>Weight: <%= boat.weight %></h5>
+  <h5>Seats: <%= boat.num_seats %></h5>
+  <p>Rowers:<br>
+    <% boat.rowers.each do |rower| %>
+      <%= rower.name %><br>
+    <%end%>
+  </p>
+
 <% end %>
 
 
