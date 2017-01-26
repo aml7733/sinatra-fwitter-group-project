@@ -30,19 +30,30 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/boats/edit' do
+    
     @boat = Boat.find_by(name: params[:boat][:name])
     erb :'/boats/edit'
   end
 
   post '/boats/edit/rowers' do
-    @boat = Boat.find_by(params[:boat])
+    binding.pry
+    @boat = Boat.find_by(name: params[:boat][:name])
     if @boat.coach_id != session[:id]
       redirect '/coach/login'
     end
 
     params[:rower].each do |rower_params|
-      place = Rower.create(rower_params)
-      place.boat_id = @boat.id
+      if rower_params[:name] != ""
+        place = Rower.create(rower_params)
+        place.boat_id = @boat.id
+      end
+    end
+    
+    if !params[:boat][:rower_ids].empty?
+      params[:boat][:rower_ids].each do |rower_id|
+        place = Rower.find(rower_id)
+        place.boat_id = @boat.id  #assign checked rowers to the boat being edited
+      end
     end
     erb :'/coaches/myboats'
   end
