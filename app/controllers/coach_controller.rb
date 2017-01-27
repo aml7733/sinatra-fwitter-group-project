@@ -16,6 +16,7 @@ class CoachController < ApplicationController
     end
     @coach = Coach.create(params[:coach])
     session[:id] = @coach.id
+    flash[:message] = "Signup successful."
     erb :'/coaches/myboats'
   end
 
@@ -31,6 +32,7 @@ class CoachController < ApplicationController
     coach = Coach.find_by(name: params[:coach][:name])
     if coach && coach.authenticate(params[:coach][:password])
       session[:id] = coach.id
+      flash[:message] = "Login successful."
       redirect '/coaches/myboats'
     else
       flash[:message] = "Login failed. Please try again."
@@ -40,11 +42,16 @@ class CoachController < ApplicationController
 
   get '/coaches/logout' do
     session.clear
+    flash[:message] = "Logout successful."
     redirect '/'
   end
 
   get '/coaches/myboats' do
-    redirect '/coaches/login' unless session[:id]
-    erb :'/coaches/myboats'
+    if session[:id]
+      erb :'/coaches/myboats'
+    else
+      flash[:message] = "Must be logged in to see coach's boat index."
+      redirect '/coaches/login'
+    end
   end
 end

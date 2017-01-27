@@ -1,0 +1,16 @@
+<h1>Boat/Rower Index</h1>
+
+<% @all_boats.each do |boat| %>
+  <h3>Name: <%= boat.name %></h3>
+  <dl>
+    <dt>Weight</dt>
+    <dd><%= boat.weight %></dd>
+    <dt>Seats</dt>
+    <dd><%= boat.num_seats %></dd>
+    <dt>Rowers</dt>
+    <dd><% boat.rowers.each do |rower| %>
+      <%= rower.name %><br>
+    <%end%></dd>
+  </dl>
+  <br>
+<% end %>
