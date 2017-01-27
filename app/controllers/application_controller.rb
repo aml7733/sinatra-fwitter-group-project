@@ -25,7 +25,10 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/boats/new' do
-    params[:boat].each_pair { |key, val| redirect '/boats/new' if val == "" }
+    params[:boat].each_pair do |key, val|
+      flash[:message] = "Cannot create boat with empty values."
+      redirect '/boats/new' if val == ""
+    end
 
     @boat = Boat.create(params[:boat])
     @boat.coach_id = session[:id]
@@ -39,6 +42,7 @@ class ApplicationController < Sinatra::Base
     if @boat.coach_id == session[:id]
       erb :'/boats/edit'
     else
+      flash[:message] = "Only the coach who created the boat may edit said boat."
       redirect '/coaches/myboats'
     end
 
@@ -47,13 +51,13 @@ class ApplicationController < Sinatra::Base
   post '/boats/edit/rowers' do
     @boat = Boat.find_by(name: params[:boat][:name])
     if @boat.coach_id != session[:id]
+      flash[:message] = "Only the coach who created the boat may edit said boat."
       redirect '/coach/login'
     end
-    binding.pry
     params[:rower].each do |rower_params|
       if rower_params[:name] != ""
         if Rower.find_by(rower_params)
-          place = Rower.find_by(rower_params)
+          place = Rower.find_by(rower_params) #check to see if rower entered in text box already exists
           place.boat_id = @boat.id
           place.save
         else

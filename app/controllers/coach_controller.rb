@@ -8,8 +8,10 @@ class CoachController < ApplicationController
 
   post '/coaches/signup' do
     if session[:id]
+      flash[:message] = "Must log out before signing up."
       redirect '/coaches/logout'
     elsif params[:coach][:name] == "" || params[:coach][:password] == ""
+      flash[:message] = "Cannot create coach with blank name or password."
       redirect '/coaches/signup'
     end
     @coach = Coach.create(params[:coach])
@@ -19,6 +21,7 @@ class CoachController < ApplicationController
 
   get '/coaches/login' do
     if session[:id]
+      flash[:message] = "Must log out before logging in."
       redirect '/coaches/logout'
     end
     erb :'/coaches/login'
@@ -30,6 +33,7 @@ class CoachController < ApplicationController
       session[:id] = coach.id
       redirect '/coaches/myboats'
     else
+      flash[:message] = "Login failed. Please try again."
       redirect '/coaches/login'
     end
   end
